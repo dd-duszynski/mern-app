@@ -4,7 +4,6 @@ import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
 import LoadingSpinner from '../../shared/components/UIElements/LoadingSpinner';
-
 import { VALIDATOR_EMAIL, VALIDATOR_MINLENGTH, VALIDATOR_REQUIRE } from '../../shared/util/validators';
 import { useForm } from '../../shared/hooks/form-hook';
 import { AuthContext } from '../../shared/context/auth-context';
@@ -56,11 +55,34 @@ const Auth = () => {
 
 	const authSubmitHandler = async (event) => {
 		event.preventDefault();
+		setIsLoading(true);
+
 		if (isLoginMode) {
-			console.log('ok');
+			try {
+				const response = await fetch('http://localhost:5000/api/users/login', {
+               method: 'POST',
+               //jeżeli nie wysyłam danych, nie muszę definiować Content-Type
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						email: formState.inputs.email.value,
+						password: formState.inputs.password.value,
+					}),
+				});
+				const responseData = await response.json();
+				//tu sprawdzam czy status będzie 400 lub 500
+				if (!response.ok) {
+					throw new Error(responseData.message);
+				}
+				setIsLoading(false);
+				auth.login();
+			} catch (err) {
+				setIsLoading(false);
+				setError(err.message || 'Something went wrong!');
+			}
 		} else {
 			try {
-				setIsLoading(true);
 				const response = await fetch('http://localhost:5000/api/users/signup', {
 					method: 'POST',
 					headers: {
@@ -77,23 +99,21 @@ const Auth = () => {
 				if (!response.ok) {
 					throw new Error(responseData.message);
 				}
-				console.log(responseData);
 				setIsLoading(false);
 				auth.login();
 			} catch (err) {
-				console.log(err);
 				setIsLoading(false);
 				setError(err.message || 'Something went wrong!');
 			}
 		}
 	};
-   const errorHandler = () => {
-      setError(null)
-   }
-   
+	const errorHandler = () => {
+		setError(null);
+	};
+
 	return (
 		<>
-			<ErrorModal error={error} onClear={errorHandler}/>
+			<ErrorModal error={error} onClear={errorHandler} />
 			<Card className='authentication'>
 				{isLoading && <LoadingSpinner asOverlay />}
 				<h2>Login Required</h2>
