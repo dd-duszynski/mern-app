@@ -1,5 +1,4 @@
 import React, { useState, useContext } from 'react';
-
 import Card from '../../shared/components/UIElements/Card';
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
@@ -76,7 +75,7 @@ const Auth = () => {
 						'Content-Type': 'application/json',
 					}
 				);
-				auth.login(responseData.user.id);
+				auth.login(responseData.userId, responseData.token);
 			} catch (err) {}
 		} else {
 			try {
@@ -86,8 +85,7 @@ const Auth = () => {
 				formData.append('password', formState.inputs.password.value);
 				formData.append('image', formState.inputs.image.value);
 				const responseData = await sendRequest('http://localhost:5000/api/users/signup', 'POST', formData);
-
-				auth.login(responseData.user.id);
+				auth.login(responseData.userId, responseData.token);
 			} catch (err) {}
 		}
 	};
@@ -111,7 +109,9 @@ const Auth = () => {
 							onInput={inputHandler}
 						/>
 					)}
-					{!isLoginMode && <ImageUpload center id='image' onInput={inputHandler} errorText='Please provide an image'/>}
+					{!isLoginMode && (
+						<ImageUpload center id='image' onInput={inputHandler} errorText='Please provide an image' />
+					)}
 					<Input
 						element='input'
 						id='email'

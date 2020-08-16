@@ -46,7 +46,6 @@ export const useHttpClient = () => {
   };
 
   useEffect(() => {
-     //funkcja czyszcząca
     return () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       activeHttpRequests.current.forEach(abortCtrl => abortCtrl.abort());

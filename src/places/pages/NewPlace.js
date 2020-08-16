@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
+
 import Input from '../../shared/components/FormElements/Input';
 import Button from '../../shared/components/FormElements/Button';
 import ErrorModal from '../../shared/components/UIElements/ErrorModal';
@@ -47,15 +48,15 @@ const NewPlace = () => {
 			formData.append('address', formState.inputs.address.value);
 			formData.append('creator', auth.userId);
 			formData.append('image', formState.inputs.image.value);
-			await sendRequest('http://localhost:5000/api/places', 'POST', formData);
+			await sendRequest('http://localhost:5000/api/places', 'POST', formData, {
+				Authorization: 'Bearer ' + auth.token,
+			});
 			history.push('/');
-		} catch (err) {
-			console.log(err);
-		}
+		} catch (err) {}
 	};
 
 	return (
-		<>
+		<React.Fragment>
 			<ErrorModal error={error} onClear={clearError} />
 			<form className='place-form' onSubmit={placeSubmitHandler}>
 				{isLoading && <LoadingSpinner asOverlay />}
@@ -84,12 +85,12 @@ const NewPlace = () => {
 					errorText='Please enter a valid address.'
 					onInput={inputHandler}
 				/>
-				<ImageUpload id='image' onInput={inputHandler} errorText='Please provide an image' />
+				<ImageUpload id='image' onInput={inputHandler} errorText='Please provide an image.' />
 				<Button type='submit' disabled={!formState.isValid}>
 					ADD PLACE
 				</Button>
 			</form>
-		</>
+		</React.Fragment>
 	);
 };
 
